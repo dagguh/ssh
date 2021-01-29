@@ -66,4 +66,13 @@ class SshTest {
     private fun installPing(sshHost: Ssh) {
         sshHost.newConnection().use { it.execute("apt-get update -qq && apt-get install iputils-ping -y") }
     }
+
+
+    @Test
+    fun shouldReadLongOutput() {
+        SshContainer().useConnection { ssh ->
+            ssh.execute("apt-get update -qq")
+            ssh.execute("DEBIAN_FRONTEND=noninteractive apt-get install -qq openjdk-11-jdk", Duration.ofMinutes(5))
+        }
+    }
 }
