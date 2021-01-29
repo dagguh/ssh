@@ -3,6 +3,7 @@ package com.atlassian.performance.tools.ssh.api
 import org.junit.Assert
 import org.junit.Test
 import java.time.Duration
+import java.util.concurrent.Executors
 import kotlin.system.measureTimeMillis
 
 class SshTest {
@@ -70,6 +71,14 @@ class SshTest {
 
     @Test
     fun shouldReadLongOutput() {
+        val pool = Executors.newCachedThreadPool()
+        (1..4)
+            .map { Runnable { installJdk() } }
+            .map { pool.submit(it) }
+            .forEach { it.get() }
+    }
+
+    private fun installJdk() {
         SshContainer().useConnection { ssh ->
             ssh.execute("apt-get update -qq")
             ssh.execute("DEBIAN_FRONTEND=noninteractive apt-get install -qq openjdk-11-jdk", Duration.ofMinutes(5))
