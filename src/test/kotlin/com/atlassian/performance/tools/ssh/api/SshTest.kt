@@ -68,11 +68,10 @@ class SshTest {
         sshHost.newConnection().use { it.execute("apt-get update -qq && apt-get install iputils-ping -y") }
     }
 
-
     @Test
     fun shouldReadLongOutput() {
         val pool = Executors.newCachedThreadPool()
-        (1..4)
+        (1..16)
             .map { Runnable { installJdk() } }
             .map { pool.submit(it) }
             .forEach { it.get() }
