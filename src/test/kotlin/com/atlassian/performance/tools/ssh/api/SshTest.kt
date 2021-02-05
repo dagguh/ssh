@@ -71,16 +71,32 @@ class SshTest {
     @Test
     fun shouldReadLongOutput() {
         val pool = Executors.newCachedThreadPool()
-        (1..16)
-            .map { Runnable { installJdk() } }
+        (1..4)
+            .map { Runnable { installChromiumDependencies() } }
             .map { pool.submit(it) }
             .forEach { it.get() }
     }
 
-    private fun installJdk() {
+    private fun installChromiumDependencies() {
         SshContainer().useConnection { ssh ->
             ssh.execute("apt-get update -qq")
-            ssh.execute("DEBIAN_FRONTEND=noninteractive apt-get install -qq openjdk-11-jdk", Duration.ofMinutes(5))
+            val packages = listOf(
+                "libx11-xcb1",
+                "libxcomposite1",
+                "libxdamage1",
+                "libxi6",
+                "libxtst6",
+                "libnss3",
+                "libcups2",
+                "libxss1",
+                "libxrandr2",
+                "libasound2",
+                "libpango1.0",
+                "libatk1.0-0",
+                "libatk-bridge2.0",
+                "libgtk-3-0"
+            ).joinToString(" ")
+            ssh.execute("DEBIAN_FRONTEND=noninteractive apt-get install -qq $packages", Duration.ofMinutes(10))
         }
     }
 }
